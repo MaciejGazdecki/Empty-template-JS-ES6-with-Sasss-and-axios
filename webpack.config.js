@@ -8,7 +8,9 @@ module.exports = {
         filename: "js/bundle.js"
     },
     devServer: {
-        contentBase: "./dist"
+        contentBase: "./dist",
+        port:3000,
+        host:"0.0.0.0",
     },
     devtool: "source-map",
     plugins: [
@@ -22,9 +24,7 @@ module.exports = {
             {
                 test: /\.js$/,
                 exclude: /node_modules/,
-                use: {
-                    loader: "babel-loader",
-                }
+                use: ['babel-loader', 'eslint-loader'],
             },
             {
                 test: /\.s[ac]ss$/i,
@@ -35,6 +35,7 @@ module.exports = {
                         loader: 'css-loader',
                         options: {
                             sourceMap: true,
+                            url:true
                         },
                     },
                     {
@@ -61,7 +62,8 @@ module.exports = {
                     {
                         loader: 'file-loader',
                         options: {
-                            name: 'images/[contenthash].[ext]',
+                            name: '[contenthash].[ext]',
+                            outputPath:'images',
                         },
                     },
                 ],
