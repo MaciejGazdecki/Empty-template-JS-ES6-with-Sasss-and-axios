@@ -1,5 +1,7 @@
 const path = require("path");
 const HtmlWebPackPlugin = require("html-webpack-plugin");
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const devMode = process.env.NODE_ENV !== 'production';
 
 module.exports = {
     entry: ['@babel/polyfill', './src/js/index.js'],
@@ -9,7 +11,7 @@ module.exports = {
     },
     devServer: {
         contentBase: "./dist",
-        port:3000,
+        port:8080,
         host:"0.0.0.0",
     },
     devtool: "source-map",
@@ -17,6 +19,11 @@ module.exports = {
         new HtmlWebPackPlugin({
             filename: "index.html",
             template: "./src/index.html"
+        }),
+        new MiniCssExtractPlugin({
+            filename: devMode ? '[name].css' :" [name].[hash].css",
+            chunkFilename:  devMode ? '[id].css' : "[id].[hash].css",
+            ignoreOrder: false
         })
     ],
     module: {
@@ -30,12 +37,20 @@ module.exports = {
                 test: /\.s[ac]ss$/i,
                 exclude: /node_modules/,
                 use: [
-                    'style-loader',
+                    {
+                        loader: MiniCssExtractPlugin.loader,
+                        options: {
+                            hmr: process.env.NODE_ENV === 'development'
+                        }
+                    },
                     {
                         loader: 'css-loader',
                         options: {
                             sourceMap: true,
-                            url:true
+                            modules: {
+                                mode: 'local',
+                                localIdentName: '[name]__[local]--[hash:base64:5]',
+                            }
                         },
                     },
                     {
@@ -54,7 +69,7 @@ module.exports = {
                             sourceMap: true,
                         }
                     }
-                    ]
+                ]
             },
             {
                 test: /\.(png|jpe?g|gif)$/i,
